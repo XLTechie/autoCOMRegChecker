@@ -14,11 +14,11 @@ import wx
 import schedule
 import time
 
-import gui
 import globalPluginHandler
+from gui.message import isModalMessageBoxActive, messageBox
+from utils.schedule import scheduleThread, ThreadTarget
 from logHandler import log
 from addonHandler import initTranslation
-from utils.schedule import scheduleThread, ThreadTarget
 from core import postNvdaStartup
 
 CHECK_REGISTRATIONS_AFTER_MINUTES = 5
@@ -34,6 +34,7 @@ except:  # Probably running in scratchpad
 class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 
 	def __init__(self) -> None:
+		super().__init__()
 		# Wait until NVDA is fully operational to setup the run schedule
 		postNvdaStartup.register(self._scheduleJob)
 
