@@ -45,7 +45,7 @@ except AddonError:  # Probably running in scratchpad
 	pass
 
 # Constants
-OLEACC_PROXY_BASE: str = r"HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Interface\{618736E0-3C3D-11CF-810C-00AA00389B71}"
+OLEACC_PROXY_BASE: str = r"HKLM\SOFTWARE\Classes\Interface\{618736E0-3C3D-11CF-810C-00AA00389B71}"
 REG32EXE = os.path.join(SYSTEM32, "reg.exe")
 REG64EXE = os.path.join(SYSNATIVE, "reg.exe")
 
@@ -81,11 +81,15 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 	def checkForBadRegistrations(self) -> bool:
 
 	def checkReg(self, key: str, val: str | None = None) -> bool:
+		if val:
+			args = [ key, "/e", "/f", val ]
+		else:
+			args = [ key ]
 		# Make sure a console window doesn't show when running reg.exe
 		startupInfo = subprocess.STARTUPINFO()
 		startupInfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
 		startupInfo.wShowWindow = subprocess.SW_HIDE
 		try:
-			subprocess.check32call([REG_EXE, "/s", fileName], startupinfo=startupInfo)
+			subprocess.check32call([ REG_EXE ] + args, startupinfo=startupInfo)
 		except subprocess.CalledProcessError as e:
 			log.error(rf"Error getting registration of key \"{key}\" in a 32-bit context: {e}")
